@@ -10,6 +10,6 @@
 <h3>OWNER'S PORTAL</h3>
 <a href="addCinema">Add Cinema</a><br>
 <a href="addMovie">Add Movie</a><br>
-<a>Add Showtime</a>
+<a href="addShowtime">Add Showtime</a>
 </body>
 </html>
