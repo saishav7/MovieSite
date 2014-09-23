@@ -49,7 +49,7 @@ public class CinemaDataProcessor {
         session.getTransaction().commit();
         session.close();
 
-        log.info("Created cinema entry for" + cinema);
+        log.info("Created cinema entry for" + location);
     }
 	
 	public void addMovie(String title, String poster, String starCast, String genre, String director, String synopsis, String ageRating, String releaseDate) throws ParseException {

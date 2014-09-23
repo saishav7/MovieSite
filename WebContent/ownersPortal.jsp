@@ -7,8 +7,9 @@
 <title>OWNER'S PORTAL</title>
 </head>
 <body>
-<a>Add Cinema</a>
-<a>Add Movie</a>
+<h3>OWNER'S PORTAL</h3>
+<a href="addCinema">Add Cinema</a><br>
+<a>Add Movie</a><br>
 <a>Add Showtime</a>
 </body>
 </html>

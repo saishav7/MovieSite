@@ -2,6 +2,7 @@
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
@@ -12,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class HomeController
  */
-@WebServlet("/owner")
+@WebServlet(name="HomeController",urlPatterns={"/owner","/addCinema"})
 public class HomeController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -28,17 +29,30 @@ public class HomeController extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		CinemaDataProcessor c = new CinemaDataProcessor();
-		// TODO Check if cinema with location exists
-		c.addCinema("Randwick", 400, "ATMs");
-		try {
-			// TODO Check if movie with title exists
-			c.addMovie("a", "a", "a", "a", "a", "a", "a", "1/1/2015");
-		} catch (ParseException e) {
-			e.printStackTrace();
+		if(request.getRequestURI().equals("/MovieSite/addCinema")){
+			if(request.getParameter("location") != null) {
+				CinemaDataProcessor c = new CinemaDataProcessor();
+				// TODO Check if cinema with location exists
+				Map<String,String[]> items = (request.getParameterMap());
+				String []amenitiesArr = items.get("amenities");
+				StringBuilder amenitiesBuilder = new StringBuilder();
+
+				for (String amenities : amenitiesArr) {
+					amenitiesBuilder.append(amenities);
+					amenitiesBuilder.append(",");
+				}
+				c.addCinema(request.getParameter("location"), Integer.parseInt(request.getParameter("seatingCap")), amenitiesBuilder.toString());
+				response.sendRedirect("owner");
+			}
+			else
+				request.getRequestDispatcher("cinema.jsp").forward(request, response);
 		}
-		request.getRequestDispatcher("/ownersPortal.jsp").forward(request, response);
+		else{
+			request.getRequestDispatcher("ownersPortal.jsp").forward(request, response);
+		}
 	}
+	
+	
 	/**
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
