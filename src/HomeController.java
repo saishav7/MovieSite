@@ -13,7 +13,7 @@ import javax.servlet.http.HttpServletResponse;
 /**
  * Servlet implementation class HomeController
  */
-@WebServlet(name="HomeController",urlPatterns={"/owner","/addCinema"})
+@WebServlet(name="HomeController",urlPatterns={"/owner","/addCinema","/addMovie","/addShowtime"})
 public class HomeController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -31,8 +31,9 @@ public class HomeController extends HttpServlet {
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
 		if(request.getRequestURI().equals("/MovieSite/addCinema")){
 			if(request.getParameter("location") != null) {
+				// TODO Input Checks
 				CinemaDataProcessor c = new CinemaDataProcessor();
-				// TODO Check if cinema with location exists
+				// TODO handle case when cinema with location exists
 				Map<String,String[]> items = (request.getParameterMap());
 				String []amenitiesArr = items.get("amenities");
 				StringBuilder amenitiesBuilder = new StringBuilder();
@@ -46,6 +47,24 @@ public class HomeController extends HttpServlet {
 			}
 			else
 				request.getRequestDispatcher("cinema.jsp").forward(request, response);
+		}
+		else if(request.getRequestURI().equals("/MovieSite/addMovie")){
+			if(request.getParameter("title") != null) {
+				// TODO Input Checks
+				CinemaDataProcessor c = new CinemaDataProcessor();
+				// TODO Handle case when movie with title exists
+				try {
+					c.addMovie(request.getParameter("title"),request.getParameter("title"),
+								request.getParameter("starcast"),request.getParameter("genre"),
+								request.getParameter("director"),request.getParameter("synopsis"),
+								request.getParameter("rating"),	request.getParameter("releaseDate"));
+				} catch (ParseException e) {
+					e.printStackTrace();
+				}
+				response.sendRedirect("owner");
+			}
+			else
+				request.getRequestDispatcher("movie.jsp").forward(request, response);
 		}
 		else{
 			request.getRequestDispatcher("ownersPortal.jsp").forward(request, response);
