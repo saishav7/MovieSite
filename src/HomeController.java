@@ -54,7 +54,7 @@ public class HomeController extends HttpServlet {
 				CinemaDataProcessor c = new CinemaDataProcessor();
 				// TODO Handle case when movie with title exists
 				try {
-					c.addMovie(request.getParameter("title"),request.getParameter("title"),
+					c.addMovie(request.getParameter("title"),request.getParameter("poster"),
 								request.getParameter("starcast"),request.getParameter("genre"),
 								request.getParameter("director"),request.getParameter("synopsis"),
 								request.getParameter("rating"),	request.getParameter("releaseDate"));
