@@ -119,7 +119,7 @@ public void addShowtime(String cinema_location, String movie_title, String timin
         log.info("Created showtime entry for " + cinema_location + " " + movie_title);
     }
 	
-	public List<Movie> findAllMovies() {
+	public List<Movie> findAllNowShowingMovies() {
 		Session session = connectToDatabase();
 		session.beginTransaction();
 		Query query = session.createQuery("from Movie");
@@ -128,7 +128,23 @@ public void addShowtime(String cinema_location, String movie_title, String timin
 		allMovies = query.list();  
 		  for (int i = 0; i < allMovies.size(); i++) {  
 		   Movie movie = (Movie) allMovies.get(i);
-		   movieList.add(movie);
+		   if(movie.getStatus().equals("Now Showing"))
+			   movieList.add(movie);
+		  }  
+        return movieList;
+    }
+	
+	public List<Movie> findAllComingSoonMovies() {
+		Session session = connectToDatabase();
+		session.beginTransaction();
+		Query query = session.createQuery("from Movie");
+		List<Movie> movieList = new ArrayList<Movie>();
+		java.util.List allMovies;  
+		allMovies = query.list();  
+		  for (int i = 0; i < allMovies.size(); i++) {  
+		   Movie movie = (Movie) allMovies.get(i);
+		   if(movie.getStatus().equals("Coming Soon"))
+			   movieList.add(movie);
 		  }  
         return movieList;
     }

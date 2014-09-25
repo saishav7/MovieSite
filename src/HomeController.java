@@ -18,7 +18,7 @@ import com.beans.Movie;
 /**
  * Servlet implementation class HomeController
  */
-@WebServlet(name="HomeController",urlPatterns={"/owner","/addCinema","/addMovie","/addShowtime"})
+@WebServlet(name="HomeController",urlPatterns={"/owner","/addCinema","/addMovie","/addShowtime","/login"})
 public class HomeController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -74,12 +74,7 @@ public class HomeController extends HttpServlet {
 		}
 		else if(request.getRequestURI().equals("/MovieSite/addShowtime")){
 			CinemaDataProcessor c = new CinemaDataProcessor();
-			List<Movie> nowShowingMovies = new ArrayList<Movie>();
-			List<Movie> l = c.findAllMovies();
-			for(Movie movie : l){
-				if(movie.getStatus().equals("Now Showing"))
-					nowShowingMovies.add(movie);
-			}
+			List<Movie> nowShowingMovies = c.findAllNowShowingMovies();
 			request.setAttribute("nowShowingMovies", nowShowingMovies);
 			List<Cinema> allCinemas = c.findAllCinemas();
 			request.setAttribute("allCinemas", allCinemas);
@@ -91,6 +86,14 @@ public class HomeController extends HttpServlet {
 			}
 			else
 				request.getRequestDispatcher("showtime.jsp").forward(request, response);
+		}
+		else if(request.getRequestURI().equals("/MovieSite/login")){
+			CinemaDataProcessor c = new CinemaDataProcessor();
+			List<Movie> nowShowingMovies = c.findAllNowShowingMovies();
+			request.setAttribute("nowShowingMovies", nowShowingMovies);
+			List<Movie> comingSoonMovies = c.findAllComingSoonMovies();
+			request.setAttribute("comingSoonMovies", comingSoonMovies);
+			request.getRequestDispatcher("login.jsp").forward(request, response);
 		}
 		else{
 			request.getRequestDispatcher("ownersPortal.jsp").forward(request, response);

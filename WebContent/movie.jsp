@@ -12,7 +12,15 @@
 Title: <input type="text" name="title"><br>
 Poster: <input type="text" name="poster"><br>
 Starcast: <input type="text" name="starcast"><br>
-Genre: <input type="text" name="genre"><br>
+Genre:<select name="genre">
+	  	<option value="Romance">Romance</option>
+	  	<option value="Thriller">Thriller</option>
+	  	<option value="Horror">Horror</option>
+	  	<option value="Comedy">Comedy</option>
+	  	<option value="Drama">Drama</option>
+	  	<option value="Biopic">Biopic</option>
+	  	<option value="Action">Action</option>
+	</select><br>
 Director: <input type="text" name="director"><br>
 Short Synopsis: <input type="text" name="synopsis"><br>
 Age Rating: <input type="text" name="rating"><br>
