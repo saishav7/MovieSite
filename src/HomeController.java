@@ -94,6 +94,8 @@ public class HomeController extends HttpServlet {
 			List<Movie> comingSoonMovies = c.findAllComingSoonMovies();
 			request.setAttribute("comingSoonMovies", comingSoonMovies);
 			request.getRequestDispatcher("login.jsp").forward(request, response);
+			// TODO Sort Now Showing movies by Rating
+			// TODO Sort Coming Soon movies by release date
 		}
 		else{
 			request.getRequestDispatcher("ownersPortal.jsp").forward(request, response);
