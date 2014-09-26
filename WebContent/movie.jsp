@@ -10,7 +10,7 @@
 <h3>Add New Movie</h3>
 <form name="input" method="get">
 Title: <input type="text" name="title"><br>
-Poster: <input type="text" name="poster"><br>
+Poster: <input type="button" name="uploadPoster" value="Upload" onClick="location.href='poster'">${message}<br>
 Starcast: <input type="text" name="starcast"><br>
 Genre:<select name="genre">
 	  	<option value="Romance">Romance</option>
@@ -25,7 +25,7 @@ Director: <input type="text" name="director"><br>
 Short Synopsis: <input type="text" name="synopsis"><br>
 Age Rating: <input type="text" name="rating"><br>
 Release Date: <input type="text" name="releaseDate"><br><br>
-
+<input type="hidden" name="movieForm" value="movieForm">
 <input type="submit" value="Add Movie">
 </form>
 </body>

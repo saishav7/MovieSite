@@ -26,7 +26,7 @@ Password: <input type="text" name="password"><br><br>
   <c:forEach items="${nowShowingMovies}" var="nsMovie">
 	  <tr>
 	    <td>${nsMovie.title}</td>
-	    <td>${nsMovie.poster}</td> 
+	    <td><img src="${nsMovie.poster}" style="width:304px;height:228px"></td> 
 	    <td>${nsMovie.ageRating}</td>
 	  </tr>
   </c:forEach>
@@ -42,7 +42,7 @@ Password: <input type="text" name="password"><br><br>
   <c:forEach items="${comingSoonMovies}" var="csMovie">
 	  <tr>
 	    <td>${csMovie.title}</td>
-	    <td>${csMovie.poster}</td> 
+	    <td><img src="${csMovie.poster}" style="width:304px;height:228px"></td> 
 	    <td>${csMovie.ageRating}</td>
 	  </tr>
   </c:forEach> 
