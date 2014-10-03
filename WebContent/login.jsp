@@ -9,9 +9,10 @@
 </head>
 <body>
 <h3>Welcome to AU Movies</h3>
-<form name="input" method="get">
+<form name="input" method="post">
+<input type="hidden" name="submitLogin">
 Username: <input type="text" name="username"><br>
-Password: <input type="text" name="password"><br><br>
+Password: <input type="password" name="password"><br><br>
 <input type="submit" value="Login"><br>
 </form>
 <input type="button" value="Register Now" onClick="location.href='register'"><br><br>

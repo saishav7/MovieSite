@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import javassist.bytecode.stackmap.TypeData.ClassName;
 
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
@@ -18,6 +19,7 @@ import org.hibernate.criterion.Restrictions;
 import com.beans.Cinema;
 import com.beans.Movie;
 import com.beans.Showtime;
+import com.beans.UserMaster;
 
 
 public class CinemaDataProcessor {
@@ -162,4 +164,22 @@ public void addShowtime(String cinema_location, String movie_title, String timin
 		  }  
         return cinemaList;
     }
+	
+	public UserMaster findVerifiedUserByUsername(String username) {
+		Session session = connectToDatabase();
+		session.beginTransaction();
+		Query query = session.createQuery("from UserMaster where usrname = :username");
+		query.setParameter("username", username);
+		java.util.List user;
+		user = query.list();
+		if(user.size() >0) {
+			UserMaster reqdUser = (UserMaster) (user.get(0));
+			if(reqdUser.getVerified() == 1)
+				return reqdUser;
+			return null;
+		}
+		else
+			return null;
+    }
+	
 }
