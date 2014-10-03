@@ -172,11 +172,9 @@ public void addShowtime(String cinema_location, String movie_title, String timin
 		query.setParameter("username", username);
 		java.util.List user;
 		user = query.list();
-		if(user.size() >0) {
+		if(user.size() > 0) {
 			UserMaster reqdUser = (UserMaster) (user.get(0));
-			if(reqdUser.getVerified() == 1)
-				return reqdUser;
-			return null;
+			return reqdUser;
 		}
 		else
 			return null;

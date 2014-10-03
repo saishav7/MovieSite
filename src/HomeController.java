@@ -115,9 +115,17 @@ public class HomeController extends HttpServlet {
 				request.setAttribute("nowShowingMovies", nowShowingMovies);
 				List<Movie> comingSoonMovies = c.findAllComingSoonMovies();
 				request.setAttribute("comingSoonMovies", comingSoonMovies);
-				request.getRequestDispatcher("login.jsp").forward(request, response);
 				// TODO Sort Now Showing movies by Rating
 				// TODO Sort Coming Soon movies by release date
+				
+				if(request.getAttribute("userExists") != null)
+					request.setAttribute("loginFailure", "User does not exist");
+				else if(request.getAttribute("userVerified") != null)
+					request.setAttribute("loginFailure", "User not verified");
+				else if(request.getParameter("submitLogin") != null)
+					request.setAttribute("loginFailure", "Incorrect Password, please try again");
+				
+				request.getRequestDispatcher("login.jsp").forward(request, response);
 			}
 			else{
 				response.sendRedirect("owner");
@@ -171,12 +179,15 @@ public class HomeController extends HttpServlet {
 			 UserMaster user;
 			 if(c.findVerifiedUserByUsername(request.getParameter("username")) != null) {
 				 user = c.findVerifiedUserByUsername(request.getParameter("username"));
-				 if(request.getParameter("password").equals(user.getPassword())){
+				 if(user.getVerified() != 1){
+					 request.setAttribute("userVerified", "false"); 
+				 }
+				 else if(request.getParameter("password").equals(user.getPassword())){
 					 userAuthenticated = 1;
 				 }
 			 }
-			 else 
-				 System.out.println("unable to login");
+			 else
+				 request.setAttribute("userExists", "false");
 			 // TODO Reasons for login failure - does not exist, incorrect pw, not authenticated
 			 doGet(request,response);
 		 }

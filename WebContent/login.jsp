@@ -12,7 +12,9 @@
 <form name="input" method="post">
 <input type="hidden" name="submitLogin">
 Username: <input type="text" name="username"><br>
-Password: <input type="password" name="password"><br><br>
+Password: <input type="password" name="password"><br>
+<i>${loginFailure}</i>
+<br>
 <input type="submit" value="Login"><br>
 </form>
 <input type="button" value="Register Now" onClick="location.href='register'"><br><br>
