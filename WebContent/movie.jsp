@@ -8,9 +8,10 @@
 </head>
 <body>
 <h3>Add New Movie</h3>
+<h4><i>(Please select poster first)</i></h4>
 <form name="input" method="get">
-Title: <input type="text" name="title"><br>
 Poster: <input type="button" name="uploadPoster" value="Upload" onClick="location.href='poster'">${message}<br>
+Title: <input type="text" name="title"><br>
 Starcast: <input type="text" name="starcast"><br>
 Genre:<select name="genre">
 	  	<option value="Romance">Romance</option>

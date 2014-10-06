@@ -149,7 +149,7 @@ public class AdminController extends HttpServlet {
 	            	part.write(savePath + File.separator + fileName);
 	            }
 	        }
-	        uploadMessage = "Upload has been done successfully!";
+	        uploadMessage = "File Selected";
 	        request.setAttribute("message", uploadMessage);
 	        doGet(request, response);
 		}

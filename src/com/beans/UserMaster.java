@@ -1,6 +1,5 @@
 package com.beans;
 
-
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -20,8 +19,17 @@ public class UserMaster {
     private String lastName;
     @Column(name = "usrnname")
     private String nickName;
+    @Column(name = "usremail")
+    private String userEmail;
     @Column(name = "usremailvrf")
     private int verified;
+    
+	public String getUsrEmail() {
+		return userEmail;
+	}
+	public void setUsrEmail(String userEmail) {
+		this.userEmail = userEmail;
+	}
 	public String getUsername() {
 		return username;
 	}
