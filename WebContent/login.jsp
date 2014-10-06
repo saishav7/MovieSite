@@ -9,11 +9,12 @@
 </head>
 <body>
 <h3>Welcome to AU Movies</h3>
+<span style="color:#ff0000"><i>${logoutMessage}</i></span>
 <form name="input" method="post">
 <input type="hidden" name="submitLogin">
 Username: <input type="text" name="username"><br>
 Password: <input type="password" name="password"><br>
-<i>${loginFailure}</i>
+<span style="color:#ff0000"><i>${loginFailure}</i></span>
 <br>
 <input type="submit" value="Login"><br>
 </form>

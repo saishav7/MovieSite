@@ -7,7 +7,8 @@
 <title>OWNER'S PORTAL</title>
 </head>
 <body>
-<h3>OWNER'S PORTAL</h3>
+<input type="button" value="Logout" onClick="location.href='/MovieSite/logout?submitLogout=true'">
+<h3><%= session.getAttribute("nickname")%>'s PORTAL</h3>
 <a href="addCinema">Add Cinema</a><br>
 <a href="addMovie">Add Movie</a><br>
 <a href="addShowtime">Add Showtime</a>

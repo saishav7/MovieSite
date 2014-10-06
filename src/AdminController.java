@@ -7,6 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.annotation.security.DeclareRoles;
+import javax.annotation.security.RolesAllowed;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -22,21 +24,21 @@ import com.beans.UserMaster;
 /**
  * Servlet implementation class HomeController
  */
-@WebServlet(name="HomeController",urlPatterns={"/owner","/addCinema","/addMovie","/addShowtime","/login","/uploadPoster","/poster"})
+@WebServlet(name="HomeController",urlPatterns={"/owner","/addCinema","/addMovie","/addShowtime","/uploadPoster","/poster"})
 @MultipartConfig(fileSizeThreshold=1024*1024*2, // 2MB
 maxFileSize=1024*1024*10,      // 10MB
 maxRequestSize=1024*1024*50)   // 50MB
-
-public class HomeController extends HttpServlet {
+@DeclareRoles({"Admin", "User"})
+@RolesAllowed("Admin")
+public class AdminController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private String filePath = "";
 	private String uploadMessage = "";
-	private int userAuthenticated = 0;
        
     /**
      * @see HttpServlet#HttpServlet()
      */
-    public HomeController() {
+    public AdminController() {
         super();
         // TODO Auto-generated constructor stub
     }
@@ -108,29 +110,6 @@ public class HomeController extends HttpServlet {
 			else
 				request.getRequestDispatcher("showtime.jsp").forward(request, response);
 		}
-		else if(request.getRequestURI().equals("/MovieSite/login")){
-			if(userAuthenticated != 1) {
-				CinemaDataProcessor c = new CinemaDataProcessor();
-				List<Movie> nowShowingMovies = c.findAllNowShowingMovies();
-				request.setAttribute("nowShowingMovies", nowShowingMovies);
-				List<Movie> comingSoonMovies = c.findAllComingSoonMovies();
-				request.setAttribute("comingSoonMovies", comingSoonMovies);
-				// TODO Sort Now Showing movies by Rating
-				// TODO Sort Coming Soon movies by release date
-				
-				if(request.getAttribute("userExists") != null)
-					request.setAttribute("loginFailure", "User does not exist");
-				else if(request.getAttribute("userVerified") != null)
-					request.setAttribute("loginFailure", "User not verified");
-				else if(request.getParameter("submitLogin") != null)
-					request.setAttribute("loginFailure", "Incorrect Password, please try again");
-				
-				request.getRequestDispatcher("login.jsp").forward(request, response);
-			}
-			else{
-				response.sendRedirect("owner");
-			}
-		}
 		else{
 			request.getRequestDispatcher("ownersPortal.jsp").forward(request, response);
 		}
@@ -174,23 +153,6 @@ public class HomeController extends HttpServlet {
 	        request.setAttribute("message", uploadMessage);
 	        doGet(request, response);
 		}
-		 if(request.getParameter("submitLogin") != null){
-			 CinemaDataProcessor c = new CinemaDataProcessor();
-			 UserMaster user;
-			 if(c.findVerifiedUserByUsername(request.getParameter("username")) != null) {
-				 user = c.findVerifiedUserByUsername(request.getParameter("username"));
-				 if(user.getVerified() != 1){
-					 request.setAttribute("userVerified", "false"); 
-				 }
-				 else if(request.getParameter("password").equals(user.getPassword())){
-					 userAuthenticated = 1;
-				 }
-			 }
-			 else
-				 request.setAttribute("userExists", "false");
-			 // TODO Reasons for login failure - does not exist, incorrect pw, not authenticated
-			 doGet(request,response);
-		 }
 	}
 	
 }
