@@ -8,13 +8,11 @@ import java.util.logging.Logger;
 
 import javassist.bytecode.stackmap.TypeData.ClassName;
 
-import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
-import org.hibernate.criterion.Restrictions;
 
 import com.beans.Cinema;
 import com.beans.Movie;

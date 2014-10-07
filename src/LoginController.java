@@ -17,6 +17,7 @@ import com.beans.UserMaster;
  * Servlet implementation class LoginController
  */
 @WebServlet(name="LoginController",urlPatterns={"/login","/logout"})
+// TODO set welcome page to login
 @RolesAllowed({"Admin","User"})
 public class LoginController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
@@ -26,7 +27,6 @@ public class LoginController extends HttpServlet {
      */
     public LoginController() {
         super();
-        // TODO Auto-generated constructor stub
     }
 
 	/**
@@ -62,6 +62,7 @@ public class LoginController extends HttpServlet {
 				request.setAttribute("logoutMessage", "Successfully Logged Out");
 			}
 			response.sendRedirect("login");
+			// TODO Logout message not showing due to redirection
 		}
 	}
 
@@ -87,7 +88,6 @@ public class LoginController extends HttpServlet {
 			 }
 			 else
 				 request.setAttribute("userExists", "false");
-			 // TODO Reasons for login failure - does not exist, incorrect pw, not authenticated
 			 doGet(request,response);
 		 }
 	}
