@@ -19,38 +19,59 @@ Password: <input type="password" name="password"><br>
 <input type="submit" value="Login"><br>
 </form>
 <input type="button" value="Register Now" onClick="location.href='register'"><br><br>
-
-<h4>NOW SHOWING</h4>
-<table>
-  <tr>
-    <th>Title</th>
-    <th>Poster</th> 
-    <th>Rating</th>
-  </tr>
-  <c:forEach items="${nowShowingMovies}" var="nsMovie">
-	  <tr>
-	    <td>${nsMovie.title}</td>
-	    <td><img src="${nsMovie.poster}" style="width:304px;height:228px"></td> 
-	    <td>${nsMovie.ageRating}</td>
-	  </tr>
-  </c:forEach>
-</table>
+<div style="overflow: auto;overflow-x:'scroll';">
+	<h4>NOW SHOWING</h4>
+	
+	<table width="100%">
+	<tr>
+	<c:forEach items="${nowShowingMovies}" var="nsMovie">
+	<td>
+	<table>
+		  <tr>
+		    <td align="center">${nsMovie.title}</td>
+		  </tr>
+		  <tr>
+		    <td align="center"><img src="${nsMovie.poster}" style="width:240px;height:330px"></td> 
+		  </tr>
+		  <tr>
+		    <td align="center">${nsMovie.ageRating}</td>
+		  </tr>
+		  <tr>
+		    <td align="center">${nsMovie.synopsis}</td>
+		  </tr>
+	</table>
+	<td>
+	</c:forEach>
+	</tr>
+	</table>
+</div>
  <br>
-<h4>COMING SOON</h4> 
-<table>
-  <tr>
-    <th>Title</th>
-    <th>Poster</th> 
-    <th>Rating</th>
-  </tr>
-  <c:forEach items="${comingSoonMovies}" var="csMovie">
-	  <tr>
-	    <td>${csMovie.title}</td>
-	    <td><img src="${csMovie.poster}" style="width:304px;height:228px"></td> 
-	    <td>${csMovie.ageRating}</td>
-	  </tr>
-  </c:forEach> 
-</table>
+<div style="overflow: auto;overflow-x:'scroll';">
+	<h4>COMING SOON</h4> 
+	
+	<table width="100%" >
+	<tr>
+	<c:forEach items="${comingSoonMovies}" var="csMovie">
+	<td>
+	<table>
+		  <tr>
+		    <td align="center">${csMovie.title}</td>
+		  </tr>
+		  <tr>
+		    <td align="center"><img src="${csMovie.poster}" style="width:240px;height:330px"></td> 
+		  </tr>
+		  <tr>
+		    <td align="center">${csMovie.ageRating}</td>
+		  </tr>
+		  <tr>
+		    <td align="center">${csMovie.synopsis}</td>
+		  </tr>
+	</table>
+	<td>
+	</c:forEach>
+	</tr>
+	</table>
+</div>
 
 </body>
 </html>

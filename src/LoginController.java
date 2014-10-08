@@ -17,7 +17,6 @@ import com.beans.UserMaster;
  * Servlet implementation class LoginController
  */
 @WebServlet(name="LoginController",urlPatterns={"/login","/logout"})
-// TODO set welcome page to login
 public class LoginController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        
@@ -69,7 +68,6 @@ public class LoginController extends HttpServlet {
 	 * @see HttpServlet#doPost(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		// TODO Auto-generated method stub
 		 if(request.getParameter("submitLogin") != null){
 			 CinemaDataProcessor c = new CinemaDataProcessor();
 			 UserMaster user;
