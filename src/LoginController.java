@@ -18,7 +18,6 @@ import com.beans.UserMaster;
  */
 @WebServlet(name="LoginController",urlPatterns={"/login","/logout"})
 // TODO set welcome page to login
-@RolesAllowed({"Admin","User"})
 public class LoginController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
        

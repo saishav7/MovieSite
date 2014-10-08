@@ -28,8 +28,6 @@ import com.beans.UserMaster;
 @MultipartConfig(fileSizeThreshold=1024*1024*2, // 2MB
 maxFileSize=1024*1024*10,      // 10MB
 maxRequestSize=1024*1024*50)   // 50MB
-@DeclareRoles({"Admin", "User"})
-@RolesAllowed("Admin")
 public class AdminController extends HttpServlet {
 	private static final long serialVersionUID = 1L;
 	private String filePath = "";
@@ -45,72 +43,79 @@ public class AdminController extends HttpServlet {
 	/**
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
+    //TODO add views to web-inf folder 
 	protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		if(request.getRequestURI().equals("/MovieSite/addCinema")){
-			if(request.getParameter("location") != null) {
-				// TODO Input Checks
-				CinemaDataProcessor c = new CinemaDataProcessor();
-				// TODO handle case when cinema with location exists
-				Map<String,String[]> items = (request.getParameterMap());
-				String []amenitiesArr = items.get("amenities");
-				StringBuilder amenitiesBuilder = new StringBuilder();
-				for (String amenities : amenitiesArr) {
-					amenitiesBuilder.append(amenities);
-					if(!(amenities.equals(amenitiesArr[amenitiesArr.length - 1])))
-						amenitiesBuilder.append(",");
+		if(request.getSession(false).getAttribute("username").equals("admin")){
+			if(request.getRequestURI().equals("/MovieSite/addCinema")){
+				if(request.getParameter("location") != null) {
+					// TODO Input Checks
+					CinemaDataProcessor c = new CinemaDataProcessor();
+					// TODO handle case when cinema with location exists
+					Map<String,String[]> items = (request.getParameterMap());
+					String []amenitiesArr = items.get("amenities");
+					StringBuilder amenitiesBuilder = new StringBuilder();
+					for (String amenities : amenitiesArr) {
+						amenitiesBuilder.append(amenities);
+						if(!(amenities.equals(amenitiesArr[amenitiesArr.length - 1])))
+							amenitiesBuilder.append(",");
+					}
+					c.addCinema(request.getParameter("location"), Integer.parseInt(request.getParameter("seatingCap")), amenitiesBuilder.toString());
+					response.sendRedirect("owner");
 				}
-				c.addCinema(request.getParameter("location"), Integer.parseInt(request.getParameter("seatingCap")), amenitiesBuilder.toString());
-				response.sendRedirect("owner");
+				else
+					request.getRequestDispatcher("cinema.jsp").forward(request, response);
 			}
-			else
-				request.getRequestDispatcher("cinema.jsp").forward(request, response);
-		}
-		else if(request.getRequestURI().equals("/MovieSite/addMovie")){
-			request.setAttribute("message", uploadMessage);
-			if(request.getParameter("movieForm") != null) {
-				// TODO Input Checks
-				CinemaDataProcessor c = new CinemaDataProcessor();
-			
-				// TODO Handle case when movie with title exists
-				try {
-					c.addMovie(request.getParameter("title"),filePath,
-								request.getParameter("starcast"),request.getParameter("genre"),
-								request.getParameter("director"),request.getParameter("synopsis"),
-								request.getParameter("rating"),	request.getParameter("releaseDate"));
-				} catch (ParseException e) {
-					e.printStackTrace();
+			else if(request.getRequestURI().equals("/MovieSite/addMovie")){
+				request.setAttribute("message", uploadMessage);
+				if(request.getParameter("movieForm") != null) {
+					// TODO Input Checks
+					CinemaDataProcessor c = new CinemaDataProcessor();
+				
+					// TODO Handle case when movie with title exists
+					try {
+						c.addMovie(request.getParameter("title"),filePath,
+									request.getParameter("starcast"),request.getParameter("genre"),
+									request.getParameter("director"),request.getParameter("synopsis"),
+									request.getParameter("rating"),	request.getParameter("releaseDate"));
+					} catch (ParseException e) {
+						e.printStackTrace();
+					}
+					uploadMessage = "";
+					response.sendRedirect("owner");
 				}
-				uploadMessage = "";
-				response.sendRedirect("owner");
+				else
+					request.getRequestDispatcher("movie.jsp").forward(request, response);
 			}
-			else
-				request.getRequestDispatcher("movie.jsp").forward(request, response);
-		}
-		
-		else if(request.getRequestURI().equals("/MovieSite/poster")) {
-		 if(request.getAttribute("message") == null) 
-			request.getRequestDispatcher("poster.jsp").forward(request, response);
-		 else
-			 response.sendRedirect("addMovie");	
-		}
-		
-		else if(request.getRequestURI().equals("/MovieSite/addShowtime")){
-			CinemaDataProcessor c = new CinemaDataProcessor();
-			List<Movie> nowShowingMovies = c.findAllNowShowingMovies();
-			request.setAttribute("nowShowingMovies", nowShowingMovies);
-			List<Cinema> allCinemas = c.findAllCinemas();
-			request.setAttribute("allCinemas", allCinemas);
 			
-			if(request.getParameter("timings") != null) {
-				// TODO check if timings exist for the cinema and movie combination, same movie can have different cinemas
-				c.addShowtime(request.getParameter("cinema_location"), request.getParameter("movie_title"), request.getParameter("timings"));
-				response.sendRedirect("owner");
+			else if(request.getRequestURI().equals("/MovieSite/poster")) {
+			 if(request.getAttribute("message") == null) 
+				request.getRequestDispatcher("poster.jsp").forward(request, response);
+			 else
+				 response.sendRedirect("addMovie");	
 			}
-			else
-				request.getRequestDispatcher("showtime.jsp").forward(request, response);
+			
+			else if(request.getRequestURI().equals("/MovieSite/addShowtime")){
+				CinemaDataProcessor c = new CinemaDataProcessor();
+				List<Movie> nowShowingMovies = c.findAllNowShowingMovies();
+				request.setAttribute("nowShowingMovies", nowShowingMovies);
+				List<Cinema> allCinemas = c.findAllCinemas();
+				request.setAttribute("allCinemas", allCinemas);
+				
+				if(request.getParameter("timings") != null) {
+					// TODO check if timings exist for the cinema and movie combination, same movie can have different cinemas
+					c.addShowtime(request.getParameter("cinema_location"), request.getParameter("movie_title"), request.getParameter("timings"));
+					response.sendRedirect("owner");
+				}
+				else
+					request.getRequestDispatcher("showtime.jsp").forward(request, response);
+			}
+			else{
+				request.getRequestDispatcher("ownersPortal.jsp").forward(request, response);
+			}
 		}
 		else{
-			request.getRequestDispatcher("ownersPortal.jsp").forward(request, response);
+			System.out.print(request.getSession(false).getAttribute("username"));
+			response.sendError(HttpServletResponse.SC_FORBIDDEN);
 		}
 	}
 	private String extractFileName(Part part) {
@@ -129,29 +134,31 @@ public class AdminController extends HttpServlet {
 	 * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
 	 */
 	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-		 if(request.getParameter("posterVar") != null){
-			// gets absolute path of the web application
-	        String appPath = request.getServletContext().getRealPath("");
-	        // constructs path of the directory to save uploaded file
-	        String savePath = appPath + File.separator + "posters";
-	         
-	        // creates the save directory if it does not exists
-	        File fileSaveDir = new File(savePath);
-	        if (!fileSaveDir.exists()) {
-	            fileSaveDir.mkdir();
-	        }
-	        
-	        for (Part part : request.getParts()) {
-	            String fileName = extractFileName(part);
-	            if(fileName != "") {
-	            	filePath = "posters" + File.separator + fileName;
-	            	part.write(savePath + File.separator + fileName);
-	            }
-	        }
-	        uploadMessage = "File Selected";
-	        request.setAttribute("message", uploadMessage);
-	        doGet(request, response);
+		if(request.getSession(false).getAttribute("username") == "admin"){
+			if(request.getParameter("posterVar") != null){
+				// gets absolute path of the web application
+		        String appPath = request.getServletContext().getRealPath("");
+		        // constructs path of the directory to save uploaded file
+		        String savePath = appPath + File.separator + "posters";
+		         
+		        // creates the save directory if it does not exists
+		        File fileSaveDir = new File(savePath);
+		        if (!fileSaveDir.exists()) {
+		            fileSaveDir.mkdir();
+		        }
+		        
+		        for (Part part : request.getParts()) {
+		            String fileName = extractFileName(part);
+		            if(fileName != "") {
+		            	filePath = "posters" + File.separator + fileName;
+		            	part.write(savePath + File.separator + fileName);
+		            }
+		        }
+		        uploadMessage = "File Selected";
+		        request.setAttribute("message", uploadMessage);
+			}
 		}
+		doGet(request, response);
 	}
 	
 }
