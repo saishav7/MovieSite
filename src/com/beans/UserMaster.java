@@ -24,10 +24,11 @@ public class UserMaster {
     @Column(name = "usremailvrf")
     private int verified;
     
-	public String getUsrEmail() {
+	
+	public String getUserEmail() {
 		return userEmail;
 	}
-	public void setUsrEmail(String userEmail) {
+	public void setUserEmail(String userEmail) {
 		this.userEmail = userEmail;
 	}
 	public String getUsername() {

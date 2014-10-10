@@ -22,7 +22,7 @@ import com.beans.UserMaster;
 /**
  * Servlet implementation class CustomerController
  */
-@WebServlet(name="CustomerController",urlPatterns={"/register","/edituser","/search","/searchResult","/searchDetails"})
+@WebServlet(name="CustomerController",urlPatterns={"/register","/editUser","/search","/searchResult","/searchDetails"})
 @MultipartConfig(fileSizeThreshold=1024*1024*2, // 2MB
 maxFileSize=1024*1024*10,      // 10MB
 maxRequestSize=1024*1024*50)   // 50MB
@@ -80,6 +80,19 @@ public class CustomerController extends HttpServlet {
 				response.sendRedirect("searchDetails.jsp");}
 			else
 				response.sendRedirect("search.jsp");
+        }
+        else if(request.getRequestURI().equals("/MovieSite/editUser")){
+        	if(request.getParameter("edit") != null){
+        		CinemaDataProcessor c = new CinemaDataProcessor();
+        		c.editUser(request.getSession(false).getAttribute("username").toString(), request.getParameter("firstname"), request.getParameter("lastname"),  request.getParameter("nickname"), request.getParameter("email"));
+        		response.sendRedirect("search.jsp");
+        	}
+        	else{
+        		CinemaDataProcessor c = new CinemaDataProcessor();
+	        	UserMaster usr = c.findVerifiedUserByUsername(request.getSession(false).getAttribute("username").toString());
+	        	request.setAttribute("usr", usr);
+	        	request.getRequestDispatcher("editUser.jsp").forward(request, response);
+        	}
         }
         else{
             request.getRequestDispatcher("search.jsp").forward(request, response);

@@ -283,7 +283,7 @@ public void addUser(String username, String userfname, String userlname, String 
 	    user.setLastName(userlname);
 	    user.setNickName(usernname);
 	    user.setPassword(userpassword);
-	    user.setUsrEmail(usremail);
+	    user.setUserEmail(usremail);
 	    user.setVerified(0);
 
 	    session.save(user);
@@ -291,6 +291,23 @@ public void addUser(String username, String userfname, String userlname, String 
 	    session.close();
 	    log.info("Created user entry for " + usremail);
 	}
+
+public void editUser(String usrname, String userfname, String userlname, String usernname, String usremail) {
+	
+    Session session = connectToDatabase();
+    session.beginTransaction();	
+    
+    UserMaster user = findVerifiedUserByUsername(usrname);
+    user.setFirstName(userfname);
+    user.setLastName(userlname);
+    user.setNickName(usernname);
+    user.setUserEmail(usremail);
+
+    session.update(user);
+    session.getTransaction().commit();
+    session.close();
+    log.info("Updated user entry for " + usrname);
+}
 
 
 

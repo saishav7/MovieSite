@@ -50,9 +50,11 @@ public class LoginController extends HttpServlet {
 				
 				request.getRequestDispatcher("login.jsp").forward(request, response);
 			}
-			else{
+			else if(request.getSession(false).getAttribute("username").equals("admin"))
+				response.sendRedirect("owner");
+			else
 				response.sendRedirect("search");
-			}
+			
 		}
 		else if(request.getParameter("submitLogout") != null){
 			if(request.getSession(false) != null){
