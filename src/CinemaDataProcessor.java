@@ -15,6 +15,7 @@ import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 
 import com.beans.Cinema;
+import com.beans.Comment;
 import com.beans.Movie;
 import com.beans.Showtime;
 import com.beans.UserMaster;
@@ -177,5 +178,121 @@ public void addShowtime(String cinema_location, String movie_title, String timin
 		else
 			return null;
     }
+	
+    public List<Movie> searchMovies(String genre, String title) {
+        System.out.println("Processor "+genre+":"+title+".");
+        String qry;
+        genre="All";title="a";
+        Session session = connectToDatabase();
+        session.beginTransaction();
+
+        if(title != null & genre != "All") qry = "from Movie where genre = :genre and title like :title";
+        else if (title != null & genre == "All") qry = "from Movie where title like :title";
+        else if (title == null & genre != "All") qry = "from Movie where genre = :genre";
+        else qry = "from Movie";
+
+        Query query = session.createQuery(qry);
+
+        if(title != null & genre != "All")
+            {query.setParameter("genre", genre);
+            query.setParameter("title", "%"+title+"%");}
+        else if (title != null & genre == "All") query.setParameter("title", "%"+title+"%");
+        else if (title == null & genre != "All") query.setParameter("genre", genre);
+
+        List<Movie> movieList = new ArrayList<Movie>();
+
+        java.util.List allMovies;
+        allMovies = query.list();
+        System.out.println("Movie count: "+allMovies.size());
+          for (int i = 0; i < allMovies.size(); i++) {
+        	  System.out.println(((Movie) allMovies.get(i)).getTitle());
+           Movie movie = (Movie) allMovies.get(i);
+           movieList.add(movie);
+          }
+        return movieList;
+    }
+
+    public List<Movie> movieDetails(String title) {
+        Session session = connectToDatabase();
+        session.beginTransaction();
+
+        Query query = session.createQuery("from Movie where title = :title");
+        query.setParameter("title", title);
+        List<Movie> movieList = new ArrayList<Movie>();
+
+        java.util.List allMovies;
+        allMovies = query.list();
+        if (allMovies.size()>0) {
+           Movie movie = (Movie) allMovies.get(0);
+           return movieList;
+          }
+        else
+            return null;
+    }
+
+    public List<Comment> movieComments(String title) {
+        Session session = connectToDatabase();
+        session.beginTransaction();
+
+        Query query = session.createQuery("from Comment where title = :title");
+        query.setParameter("title", title);
+        List<Comment> movieComments = new ArrayList<Comment>();
+
+        java.util.List allMoviesComments;
+        allMoviesComments = query.list();
+        for (int i = 0; i < allMoviesComments.size(); i++) {
+           Comment movieComment = (Comment) allMoviesComments.get(i);
+               movieComments.add(movieComment);
+          }
+           return movieComments;
+    }
+
+    public List<Cinema> movieCinemas(String title, String dat) {
+        Session session = connectToDatabase();
+        session.beginTransaction();
+
+        Query q1 = session.createQuery("from Movie where title = :title and release_date >= :dat");
+        q1.setParameter("title", title);
+        q1.setParameter("dat", dat);
+        List<Movie> movieList = new ArrayList<Movie>();
+
+        java.util.List allMovies;
+        allMovies = q1.list();
+        if (allMovies.size()>0) {
+        Query query = session.createQuery("from Cinema where title = :title");
+        query.setParameter("title", title);
+        List<Cinema> cinemaList = new ArrayList<Cinema>();
+        java.util.List allCinemas;
+        allCinemas = query.list();
+          for (int i = 0; i < allCinemas.size(); i++) {
+           Cinema cinema = (Cinema) allCinemas.get(i);
+           cinemaList.add(cinema);
+          }
+        return cinemaList;}
+        else return null;
+    }
+    
+public void addUser(String username, String userfname, String userlname, String usernname, String userpassword, String usremail) {
+		
+	    Session session = connectToDatabase();
+	    session.beginTransaction();	
+	    UserMaster user = new UserMaster();
+	    
+	    user.setUsername(username);
+	    user.setFirstName(userfname);
+	    user.setLastName(userlname);
+	    user.setNickName(usernname);
+	    user.setPassword(userpassword);
+	    user.setUsrEmail(usremail);
+	    user.setVerified(0);
+
+	    session.save(user);
+	    session.getTransaction().commit();
+	    session.close();
+	    log.info("Created user entry for " + usremail);
+	}
+
+
+
 	
 }

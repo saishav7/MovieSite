@@ -51,7 +51,7 @@ public class LoginController extends HttpServlet {
 				request.getRequestDispatcher("login.jsp").forward(request, response);
 			}
 			else{
-				response.sendRedirect("owner");
+				response.sendRedirect("search");
 			}
 		}
 		else if(request.getParameter("submitLogout") != null){
