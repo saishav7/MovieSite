@@ -309,7 +309,18 @@ public void editUser(String usrname, String userfname, String userlname, String 
     log.info("Updated user entry for " + usrname);
 }
 
-
+public void verifyUser(String usrname) {
+	
+    Session session = connectToDatabase();
+    session.beginTransaction();	
+    
+    UserMaster user = findVerifiedUserByUsername(usrname);
+    user.setVerified(1);
+    session.update(user);
+    session.getTransaction().commit();
+    session.close();
+    log.info("Verified user " + usrname);
+}
 
 	
 }

@@ -9,7 +9,7 @@
 <body>
 
 <form name="search" method="post" action="search">
-<h3>Hello <%= session.getAttribute("firstname")%>!</h3>
+<h3>Hello <%= request.getSession(false).getAttribute("username").toString()%>!</h3>
 <a href="editUser">Edit Profile</a><br><br>
 Enter Movie Title <input type="text" name="title"><br><br>
 OR Search on a<br><br>

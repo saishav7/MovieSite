@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Context debug="1" reloadable="true" crossContext="true">
+  <!--
+  	Defining a mail session in the context
+  	Configure the parameters with underscores
+   -->
+  <Resource name="mail/Session" auth="Container"
+          type="javax.mail.Session"
+  		  mail.smtp.host="smtp.gmail.com"
+  		  mail.smtp.port="587"
+  		  mail.smtp.auth="true"
+  		  mail.smtp.user="auaumovies@gmail.com"
+  		  password="moviesauau"
+  		  mail.debug="false"
+  		  mail.smtp.starttls.enable="true"/>             
+</Context>

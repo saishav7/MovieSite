@@ -1,23 +1,27 @@
 
-import java.io.File;
 import java.io.IOException;
-import java.text.ParseException;
-import java.util.ArrayList;
+import java.net.URL;
+import java.nio.charset.Charset;
+import java.security.GeneralSecurityException;
 import java.util.List;
-import java.util.Map;
+import java.util.logging.Logger;
 
+import javax.crypto.Cipher;
+import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
 
 import com.beans.Cinema;
 import com.beans.Comment;
 import com.beans.Movie;
 import com.beans.UserMaster;
+import com.helper.MailSender;
 
 /**
  * Servlet implementation class CustomerController
@@ -28,10 +32,8 @@ maxFileSize=1024*1024*10,      // 10MB
 maxRequestSize=1024*1024*50)   // 50MB
 
 public class CustomerController extends HttpServlet {
-    private static final long serialVersionUID = 1L;
-    private String filePath = "";
-    private String uploadMessage = "";
-    private int userAuthenticated = 0;
+	private static final long serialVersionUID = 1L;
+	static Logger logger = Logger.getLogger(CustomerController.class.getName());
        
     /**
      * @see HttpServlet#HttpServlet()
@@ -46,13 +48,30 @@ public class CustomerController extends HttpServlet {
      */
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	if(request.getRequestURI().equals("/MovieSite/register")){
-            if(request.getParameter("nam") != null) {
+    		if(request.getParameter("confirmRegistration") != null && request.getParameter("unknownVal") != null){
+    			
+    			CinemaDataProcessor c = new CinemaDataProcessor();
+    			try {
+					c.verifyUser(decrypt("aumoviesaumovies", request.getParameter("unknownVal").getBytes()));
+					response.sendRedirect("search.jsp");
+				} catch (GeneralSecurityException e) {
+					e.printStackTrace();
+				}
+    		}
+    		else if(request.getParameter("nam") != null) {
+            	// TODO add activation.jar and mail.jar to tomcat lib folder
                 // TODO Input Checks
                 CinemaDataProcessor c = new CinemaDataProcessor();
                 // TODO handle case when user with name exists
                 c.addUser(request.getParameter("nam"), request.getParameter("fnam"), request.getParameter("lnam"), request.getParameter("nnam"), request.getParameter("pwd"), request.getParameter("eml"));
                 //response.sendRedirect("edituser.jsp");
-                response.sendRedirect("search");
+                try {
+					sendEmailMessage(request.getParameter("eml"), encrypt("aumoviesaumovies",request.getParameter("nam")));
+				System.out.println(encrypt("aumoviesaumovies",request.getParameter("nam")));
+                } catch (GeneralSecurityException e) {
+					e.printStackTrace();
+				}
+                response.sendRedirect("search.jsp");
             }
             else
                 request.getRequestDispatcher("register.jsp").forward(request, response);
@@ -105,4 +124,55 @@ public class CustomerController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	doGet(request,response);
     }
+    
+    
+    public void sendEmailMessage(String to, byte[] encrypted){
+		MailSender sender = null;
+		try{
+			sender = MailSender.getMailSender();
+			String fromAddress = "auaumovies@gmail.com";
+			String toAddress = to;
+			String subject = "Registration";
+			StringBuffer mailBody = new StringBuffer();
+			mailBody.append("Welcome to AU Movies <br> Please Click on the link below to complete registration <br> <a href='http://localhost:8080/MovieSite/register?unknownVal="+ 
+					encrypted+"&confirmRegistration=true'>Complete Registration</a>");
+			sender.sendMessage(fromAddress, toAddress, subject, mailBody);
+ 		}catch(Exception e){
+ 			System.out.println("here");
+			e.printStackTrace();
+		}
+	}
+    
+    public static byte[] encrypt(String key, String value)
+    	      throws GeneralSecurityException {
+
+	    byte[] raw = key.getBytes(Charset.forName("US-ASCII"));
+	    if (raw.length != 16) {
+	      throw new IllegalArgumentException("Invalid key size.");
+	    }
+
+	    SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
+	    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+	    cipher.init(Cipher.ENCRYPT_MODE, skeySpec,
+	        new IvParameterSpec(new byte[16]));
+	    return cipher.doFinal(value.getBytes(Charset.forName("US-ASCII")));
+	  }
+
+	  public static String decrypt(String key, byte[] encrypted)
+	      throws GeneralSecurityException {
+
+	    byte[] raw = key.getBytes(Charset.forName("US-ASCII"));
+	    if (raw.length != 16) {
+	      throw new IllegalArgumentException("Invalid key size.");
+	    }
+	    SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
+
+	    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
+	    cipher.init(Cipher.DECRYPT_MODE, skeySpec,
+	        new IvParameterSpec(new byte[16]));
+	    byte[] original = cipher.doFinal(encrypted);
+
+	    return new String(original, Charset.forName("US-ASCII"));
+    }
+    	
 }

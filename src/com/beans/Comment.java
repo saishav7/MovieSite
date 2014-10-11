@@ -11,9 +11,9 @@ public class Comment {
 	@Id
     @Column(name = "movie_title")
     private String movieTitle;
-    @Column(name = "username")
+    @Column(name = "usrname")
     private String usrname;
-    @Column(name = "usernname")
+    @Column(name = "usrnname")
     private String usrnname;
     @Column(name = "cmnt")
     private String cmnt;
