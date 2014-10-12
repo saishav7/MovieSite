@@ -1,5 +1,7 @@
 package com.beans;
 
+import java.util.Date;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
@@ -12,50 +14,50 @@ public class Comment {
     @Column(name = "movie_title")
     private String movieTitle;
     @Column(name = "usrname")
-    private String usrname;
+    private String username;
     @Column(name = "usrnname")
-    private String usrnname;
+    private String userNickName;
     @Column(name = "cmnt")
-    private String cmnt;
+    private String commentText;
     @Column(name = "cmntdate")
-    private String cmntdate;
+    private Date commentDate;
     @Column(name = "usrrating")
     private int rating;
+	public String getMovieTitle() {
+		return movieTitle;
+	}
+	public void setMovieTitle(String movieTitle) {
+		this.movieTitle = movieTitle;
+	}
+	public String getUsername() {
+		return username;
+	}
+	public void setUsername(String username) {
+		this.username = username;
+	}
+	public String getUserNickName() {
+		return userNickName;
+	}
+	public void setUserNickName(String uesrNickName) {
+		this.userNickName = uesrNickName;
+	}
+	public String getCommentText() {
+		return commentText;
+	}
+	public void setCommentText(String commentText) {
+		this.commentText = commentText;
+	}
+	public Date getCommentDate() {
+		return commentDate;
+	}
+	public void setCommentDate(Date commentDate) {
+		this.commentDate = commentDate;
+	}
+	public int getRating() {
+		return rating;
+	}
+	public void setRating(int rating) {
+		this.rating = rating;
+	}
  
-    public String getmovietitle() {
-        return movieTitle;
-    }
-    public void setmovietitle(String movietitle) {
-        this.movieTitle = movietitle;
-    }
-    public String getusrname() {
-        return usrname;
-    }
-    public void setusrname(String usrname) {
-        this.usrname = usrname;
-    }
-    public String getusrnname() {
-        return usrnname;
-    }
-    public void setusrnname(String usrnname) {
-        this.usrnname = usrnname;
-    }
-    public String getcmnt() {
-        return cmnt;
-    }
-    public void setcmnt(String cmnt) {
-        this.cmnt = cmnt;
-    }
-    public String getcmntdate() {
-        return cmntdate;
-    }
-    public void setcmntdate(String cmntdate) {
-        this.cmntdate = cmntdate;
-    }
-    public Integer getusrrating() {
-        return rating;
-    }
-    public void setusrrating(Integer usrrating) {
-        this.rating = usrrating;
-    }
 }

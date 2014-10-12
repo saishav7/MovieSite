@@ -23,8 +23,15 @@ public class UserMaster {
     private String userEmail;
     @Column(name = "usremailvrf")
     private int verified;
-    
+    @Column(name = "encrypted")
+    private String encryptedVal;
 	
+	public String getEncryptedVal() {
+		return encryptedVal;
+	}
+	public void setEncryptedVal(String encryptedVal) {
+		this.encryptedVal = encryptedVal;
+	}
 	public String getUserEmail() {
 		return userEmail;
 	}

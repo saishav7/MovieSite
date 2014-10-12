@@ -3,6 +3,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.logging.Logger;
 
@@ -51,7 +52,7 @@ public class CinemaDataProcessor {
         if(amenities != null)
         	cinema.setAmenities(amenities);
            
-        session.save(cinema);
+        session.saveOrUpdate(cinema);
         session.getTransaction().commit();
         session.close();
 
@@ -93,7 +94,7 @@ public class CinemaDataProcessor {
 		        	movie.setStatus("Now Showing");
 	        
 	        }
-	        session.save(movie);
+	        session.saveOrUpdate(movie);
 	        session.getTransaction().commit();
 	        session.close();
 	
@@ -113,7 +114,7 @@ public void addShowtime(String cinema_location, String movie_title, String timin
         if(movie_title != null)
         	showtime.setMovieTitle(movie_title);
         showtime.setTimings(timings);
-        session.save(showtime);
+        session.saveOrUpdate(showtime);
         session.getTransaction().commit();
         session.close();
 
@@ -164,7 +165,7 @@ public void addShowtime(String cinema_location, String movie_title, String timin
         return cinemaList;
     }
 	
-	public UserMaster findVerifiedUserByUsername(String username) {
+	public UserMaster findUserByUsername(String username) {
 		Session session = connectToDatabase();
 		session.beginTransaction();
 		Query query = session.createQuery("from UserMaster where usrname = :username");
@@ -177,6 +178,25 @@ public void addShowtime(String cinema_location, String movie_title, String timin
 		}
 		else
 			return null;
+    }
+	
+	public int findAvgRatingByMovie(String movie) {
+		Session session = connectToDatabase();
+		session.beginTransaction();
+		Query query = session.createQuery("from Comment where movie_title = :movie");
+		query.setParameter("movie", movie);
+		java.util.List cmnts;
+		cmnts = query.list();
+		if(cmnts.size() > 0) {
+			int rating = 0;
+			for(int i = 0; i < cmnts.size(); i++){
+				Comment com = (Comment) (cmnts.get(i));
+				rating = rating + com.getRating();
+			}
+			return (rating/cmnts.size());
+		}
+		else
+			return 0;
     }
 	
     public List<Movie> searchMovies(String genre, String title) {
@@ -272,7 +292,24 @@ public void addShowtime(String cinema_location, String movie_title, String timin
         else return null;
     }
     
-public void addUser(String username, String userfname, String userlname, String usernname, String userpassword, String usremail) {
+    public boolean isNowShowing(String title) {
+        Session session = connectToDatabase();
+        session.beginTransaction();
+
+        Query q1 = session.createQuery("from Movie where title = :title");
+        q1.setParameter("title", title);
+
+        java.util.List movie;
+        movie = q1.list();
+        if (movie.size() > 0) {
+           Movie m = (Movie) movie.get(0);
+           if(m.getStatus().equals("Now Showing"))
+        	   return true;
+          }
+        return false;
+    }
+    
+public void addUser(String username, String userfname, String userlname, String usernname, String userpassword, String usremail, String encryptedVal) {
 		
 	    Session session = connectToDatabase();
 	    session.beginTransaction();	
@@ -285,6 +322,7 @@ public void addUser(String username, String userfname, String userlname, String 
 	    user.setPassword(userpassword);
 	    user.setUserEmail(usremail);
 	    user.setVerified(0);
+	    user.setEncryptedVal(encryptedVal);
 
 	    session.save(user);
 	    session.getTransaction().commit();
@@ -292,12 +330,30 @@ public void addUser(String username, String userfname, String userlname, String 
 	    log.info("Created user entry for " + usremail);
 	}
 
+public void addComment(String username, String usernname, String title, String pcomment, Integer rating) {
+
+    Session session = connectToDatabase();
+    session.beginTransaction();
+    Comment comment = new Comment();
+
+    comment.setMovieTitle(title);
+    comment.setUsername(username);
+    comment.setUserNickName(usernname);
+    comment.setCommentText(pcomment);
+    comment.setRating(rating);
+    comment.setCommentDate(new Date());
+    session.saveOrUpdate(comment);
+    session.getTransaction().commit();
+    session.close();
+    log.info("Created comment entry for " + title + "by" + username);
+}
+
 public void editUser(String usrname, String userfname, String userlname, String usernname, String usremail) {
 	
     Session session = connectToDatabase();
     session.beginTransaction();	
     
-    UserMaster user = findVerifiedUserByUsername(usrname);
+    UserMaster user = findUserByUsername(usrname);
     user.setFirstName(userfname);
     user.setLastName(userlname);
     user.setNickName(usernname);
@@ -313,8 +369,7 @@ public void verifyUser(String usrname) {
 	
     Session session = connectToDatabase();
     session.beginTransaction();	
-    
-    UserMaster user = findVerifiedUserByUsername(usrname);
+    UserMaster user = findUserByUsername(usrname);
     user.setVerified(1);
     session.update(user);
     session.getTransaction().commit();

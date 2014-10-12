@@ -1,6 +1,11 @@
 
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.security.RolesAllowed;
@@ -35,11 +40,45 @@ public class LoginController extends HttpServlet {
 			if(request.getSession(false) == null || request.getSession(false).getAttribute("userAuthenticated") != "true" ) {
 				CinemaDataProcessor c = new CinemaDataProcessor();
 				List<Movie> nowShowingMovies = c.findAllNowShowingMovies();
-				request.setAttribute("nowShowingMovies", nowShowingMovies);
 				List<Movie> comingSoonMovies = c.findAllComingSoonMovies();
+				
+				
+				Collections.sort(comingSoonMovies, new Comparator<Movie>() {
+				    @Override public int compare(Movie p1, Movie p2) {
+				    	Date p1Date = new Date();
+				    	Date p2Date = new Date();
+				    	
+						try {
+							p1Date = new SimpleDateFormat("dd/MM/yyyy").parse(p1.getReleaseDate());
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+						try {
+							p2Date = new SimpleDateFormat("dd/MM/yyyy").parse(p2.getReleaseDate());
+						} catch (ParseException e) {
+							e.printStackTrace();
+						}
+				    	if (p1Date.before(p2Date)) {
+				            return -1;
+				        } else if (p1Date.after(p2Date)) {
+				            return 1;
+				        } else {
+				            return 0;
+				        }        
+				    }
+				});
+				
+				Collections.sort(nowShowingMovies, new Comparator<Movie>() {
+				    @Override public int compare(Movie p1, Movie p2) {
+				    	CinemaDataProcessor c = new CinemaDataProcessor();
+				    	int r1 = c.findAvgRatingByMovie(p1.getTitle());
+				    	int r2 = c.findAvgRatingByMovie(p2.getTitle());
+				    	return r2 - r1;
+				    }
+				});
+		
+				request.setAttribute("nowShowingMovies", nowShowingMovies);
 				request.setAttribute("comingSoonMovies", comingSoonMovies);
-				// TODO Sort Now Showing movies by Rating
-				// TODO Sort Coming Soon movies by release date
 				
 				if(request.getAttribute("userExists") != null)
 					request.setAttribute("loginFailure", "User does not exist");
@@ -73,17 +112,21 @@ public class LoginController extends HttpServlet {
 		 if(request.getParameter("submitLogin") != null){
 			 CinemaDataProcessor c = new CinemaDataProcessor();
 			 UserMaster user;
-			 if(c.findVerifiedUserByUsername(request.getParameter("username")) != null) {
-				 user = c.findVerifiedUserByUsername(request.getParameter("username"));
+			 if(c.findUserByUsername(request.getParameter("username")) != null) {
+				 user = c.findUserByUsername(request.getParameter("username"));
 				 if(user.getVerified() != 1){
 					 request.setAttribute("userVerified", "false"); 
-				 }
-				 else if(request.getParameter("password").equals(user.getPassword())){
-					 request.getSession().setAttribute("userAuthenticated", "true");
-					 request.getSession().setAttribute("username", user.getUsername());
-					 request.getSession().setAttribute("firstname", user.getFirstName());
-					 request.getSession().setAttribute("nickname", user.getNickName());
-				 }
+				 } else
+					try {
+						if(Md5Digest.main(request.getParameter("password")).equals(user.getPassword())){
+							 request.getSession().setAttribute("userAuthenticated", "true");
+							 request.getSession().setAttribute("username", user.getUsername());
+							 request.getSession().setAttribute("firstname", user.getFirstName());
+							 request.getSession().setAttribute("nickname", user.getNickName());
+						 }
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
 			 }
 			 else
 				 request.setAttribute("userExists", "false");

@@ -9,7 +9,8 @@
 </head>
 <body>
 <h3>Welcome to AU Movies</h3>
-<span style="color:#ff0000"><i>${logoutMessage}</i></span>
+<c:set var="logoutMsg" value='<%= request.getAttribute("logoutMessage") %>'/>
+<span style="color:#ff0000"><c:if test="${not empty logoutMsg}"><i><c:out value="${logoutMsg}" /></i></c:if></span>
 <form name="input" method="post">
 <input type="hidden" name="submitLogin">
 Username: <input type="text" name="username"><br>

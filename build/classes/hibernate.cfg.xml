@@ -22,6 +22,8 @@
        <mapping class="com.beans.Movie"/>
        <mapping class="com.beans.Showtime"/>
        <mapping class="com.beans.UserMaster"/>
+       <mapping class="com.beans.Comment"/>
+       <mapping class="com.beans.Booking"/>
 
     </session-factory>
 </hibernate-configuration>

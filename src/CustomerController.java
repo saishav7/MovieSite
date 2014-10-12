@@ -1,15 +1,10 @@
 
 import java.io.IOException;
-import java.net.URL;
-import java.nio.charset.Charset;
-import java.security.GeneralSecurityException;
+import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.logging.Logger;
 
-import javax.crypto.Cipher;
-import javax.crypto.spec.IvParameterSpec;
-import javax.crypto.spec.SecretKeySpec;
-import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -26,7 +21,7 @@ import com.helper.MailSender;
 /**
  * Servlet implementation class CustomerController
  */
-@WebServlet(name="CustomerController",urlPatterns={"/register","/editUser","/search","/searchResult","/searchDetails"})
+@WebServlet(name="CustomerController",urlPatterns={"/register","/editUser","/search","/searchResult","/searchDetails","/comment"})
 @MultipartConfig(fileSizeThreshold=1024*1024*2, // 2MB
 maxFileSize=1024*1024*10,      // 10MB
 maxRequestSize=1024*1024*50)   // 50MB
@@ -49,26 +44,38 @@ public class CustomerController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
     	if(request.getRequestURI().equals("/MovieSite/register")){
     		if(request.getParameter("confirmRegistration") != null && request.getParameter("unknownVal") != null){
-    			
     			CinemaDataProcessor c = new CinemaDataProcessor();
-    			try {
-					c.verifyUser(decrypt("aumoviesaumovies", request.getParameter("unknownVal").getBytes()));
-					response.sendRedirect("search.jsp");
-				} catch (GeneralSecurityException e) {
+				try {
+					UserMaster u = c.findUserByUsername(request.getParameter("confirmRegistration"));
+					if(u.getEncryptedVal().equals(request.getParameter("unknownVal"))){
+						c.verifyUser(request.getParameter("confirmRegistration"));
+						System.out.println("Verification Complete");
+					}
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
+				response.sendRedirect("search.jsp");
     		}
     		else if(request.getParameter("nam") != null) {
             	// TODO add activation.jar and mail.jar to tomcat lib folder
                 // TODO Input Checks
                 CinemaDataProcessor c = new CinemaDataProcessor();
                 // TODO handle case when user with name exists
-                c.addUser(request.getParameter("nam"), request.getParameter("fnam"), request.getParameter("lnam"), request.getParameter("nnam"), request.getParameter("pwd"), request.getParameter("eml"));
-                //response.sendRedirect("edituser.jsp");
+                String encrypt="";
+				try {
+					encrypt = Md5Digest.main(request.getParameter("nam"));
+				} catch (Exception e2) {
+					// TODO Auto-generated catch block
+					e2.printStackTrace();
+				}
                 try {
-					sendEmailMessage(request.getParameter("eml"), encrypt("aumoviesaumovies",request.getParameter("nam")));
-				System.out.println(encrypt("aumoviesaumovies",request.getParameter("nam")));
-                } catch (GeneralSecurityException e) {
+					c.addUser(request.getParameter("nam"), request.getParameter("fnam"), request.getParameter("lnam"), request.getParameter("nnam"), Md5Digest.main(request.getParameter("pwd")), request.getParameter("eml"),encrypt);
+				} catch (Exception e1) {
+					e1.printStackTrace();
+				}
+                try {
+					sendEmailMessage(request.getParameter("eml"), encrypt, request.getParameter("nam"));
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
                 response.sendRedirect("search.jsp");
@@ -100,6 +107,36 @@ public class CustomerController extends HttpServlet {
 			else
 				response.sendRedirect("search.jsp");
         }
+        else if(request.getRequestURI().equals("/MovieSite/comment")){
+        	if(request.getParameter("cTitle") != null && (request.getParameter("rating") != null || request.getParameter("comment") != null)){
+        		CinemaDataProcessor c = new CinemaDataProcessor();
+        		if(request.getSession(false).getAttribute("username") != null && request.getSession(false).getAttribute("nickname") != null
+        			&& c.isNowShowing(request.getParameter("cTitle")) == true) {
+		        	c.addComment(request.getSession(false).getAttribute("username").toString(), request.getSession(false).getAttribute("nickname").toString(), 
+		        				request.getParameter("cTitle"), request.getParameter("comment"), 
+		        				Integer.parseInt(request.getParameter("rating")));
+		        	response.sendRedirect("searchResult?dettitle="+request.getParameter("cTitle"));
+        		}
+        		else if(request.getSession(false).getAttribute("username") == null) {
+	        		response.sendError(HttpServletResponse.SC_FORBIDDEN);
+        		}
+        		else {
+        			request.setAttribute("errorMessage", "Movie has not been released yet");
+        			response.sendRedirect("errors.jsp");
+        		}
+        		
+        	}
+        	else if(request.getParameter("cTitle") != null){
+        		request.setAttribute("movie", request.getParameter("cTitle"));
+        		request.getRequestDispatcher("comment.jsp").forward(request, response);
+        		
+        	}
+        	else{
+        		request.setAttribute("errorMessage", "Mo movie to add comments for");
+				response.sendRedirect("error.jsp");
+        	}
+        	
+        }
         else if(request.getRequestURI().equals("/MovieSite/editUser")){
         	if(request.getParameter("edit") != null){
         		CinemaDataProcessor c = new CinemaDataProcessor();
@@ -108,7 +145,7 @@ public class CustomerController extends HttpServlet {
         	}
         	else{
         		CinemaDataProcessor c = new CinemaDataProcessor();
-	        	UserMaster usr = c.findVerifiedUserByUsername(request.getSession(false).getAttribute("username").toString());
+	        	UserMaster usr = c.findUserByUsername(request.getSession(false).getAttribute("username").toString());
 	        	request.setAttribute("usr", usr);
 	        	request.getRequestDispatcher("editUser.jsp").forward(request, response);
         	}
@@ -126,7 +163,7 @@ public class CustomerController extends HttpServlet {
     }
     
     
-    public void sendEmailMessage(String to, byte[] encrypted){
+    public void sendEmailMessage(String to, String encrypted, String user){
 		MailSender sender = null;
 		try{
 			sender = MailSender.getMailSender();
@@ -134,8 +171,9 @@ public class CustomerController extends HttpServlet {
 			String toAddress = to;
 			String subject = "Registration";
 			StringBuffer mailBody = new StringBuffer();
-			mailBody.append("Welcome to AU Movies <br> Please Click on the link below to complete registration <br> <a href='http://localhost:8080/MovieSite/register?unknownVal="+ 
-					encrypted+"&confirmRegistration=true'>Complete Registration</a>");
+			encrypted = URLEncoder.encode(encrypted,"UTF-8");
+			mailBody.append("Welcome to AU Movies <br> Please Click on the link below to complete registration <br> http://localhost:8080/MovieSite/register?unknownVal="+ 
+					encrypted+"&confirmRegistration="+user);
 			sender.sendMessage(fromAddress, toAddress, subject, mailBody);
  		}catch(Exception e){
  			System.out.println("here");
@@ -143,36 +181,4 @@ public class CustomerController extends HttpServlet {
 		}
 	}
     
-    public static byte[] encrypt(String key, String value)
-    	      throws GeneralSecurityException {
-
-	    byte[] raw = key.getBytes(Charset.forName("US-ASCII"));
-	    if (raw.length != 16) {
-	      throw new IllegalArgumentException("Invalid key size.");
-	    }
-
-	    SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
-	    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-	    cipher.init(Cipher.ENCRYPT_MODE, skeySpec,
-	        new IvParameterSpec(new byte[16]));
-	    return cipher.doFinal(value.getBytes(Charset.forName("US-ASCII")));
-	  }
-
-	  public static String decrypt(String key, byte[] encrypted)
-	      throws GeneralSecurityException {
-
-	    byte[] raw = key.getBytes(Charset.forName("US-ASCII"));
-	    if (raw.length != 16) {
-	      throw new IllegalArgumentException("Invalid key size.");
-	    }
-	    SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
-
-	    Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-	    cipher.init(Cipher.DECRYPT_MODE, skeySpec,
-	        new IvParameterSpec(new byte[16]));
-	    byte[] original = cipher.doFinal(encrypted);
-
-	    return new String(original, Charset.forName("US-ASCII"));
-    }
-    	
 }

@@ -46,11 +46,6 @@ function ValidateEmail(){
 		nam.focus();
 		return false;
 	}
-	if (namlen<8){
-		alert("Please Enter a User Name which is at least 8 characters long.");
-		nam.focus();
-		return false;
-	}
 	if ((pwd.value==null)||(pwd.value=="")){
 		alert("Please Enter your Password. Should be at least 8 characters long.");
 		pwd.focus();

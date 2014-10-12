@@ -4,13 +4,9 @@
 <html>
 <head>
 <meta http-equiv="Content-Type" content="text/html; charset=US-ASCII">
-<title>OWNER'S PORTAL</title>
+<title><%= request.getParameter("errorMessage") %></title>
 </head>
 <body>
-<input type="button" value="Logout" onClick="location.href='/MovieSite/logout?submitLogout=true'">
-<h3>ADMIN PORTAL</h3>
-<a href="addCinema">Add Cinema</a><br>
-<a href="addMovie">Add Movie</a><br>
-<a href="addShowtime">Add Showtime</a>
+<%= request.getParameter("errorMessage") %>
 </body>
 </html>

@@ -25,7 +25,7 @@ Genre:<select name="genre">
 Director: <input type="text" name="director"><br>
 Short Synopsis: <input type="text" name="synopsis"><br>
 Age Rating: <input type="text" name="rating"><br>
-Release Date: <input type="text" name="releaseDate"><br><br>
+Release Date: <input type="text" name="releaseDate"><i>(dd/mm/yyyy) e.g.10/11/2014</i> <br><br> 
 <input type="hidden" name="movieForm" value="movieForm">
 <input type="submit" value="Add Movie">
 </form>
